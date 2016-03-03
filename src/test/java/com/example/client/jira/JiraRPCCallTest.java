@@ -21,8 +21,8 @@ public class JiraRPCCallTest {
 
 	@BeforeMethod
 	public void setupHandler() {
-		jiraClient = JiraClientImpl.create("https://projects.devel.engineering.redhat.com/rest/api/2/", "wguo",
-				"redhat");
+		jiraClient = JiraClientImpl.create("https://com.example.client/rest/api/2/", "user",
+				"passwd");
 	}
 
 	private Issue generateIssue() {
