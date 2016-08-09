@@ -14,10 +14,12 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class JiraClientImpl implements JiraClient {
 
@@ -103,6 +105,25 @@ public class JiraClientImpl implements JiraClient {
         return gson.toJson(map);
     }
 
+	@Override
+	public List<Comment> getComments(String issueId) throws Exception {
+		String comments = ISSUE_SERVICE + "/" + issueId + "/comment";
+		Map<String, String> map = new HashMap<>();
+        map.put("orderBy", "created");
+        Gson gson = new Gson();
+        String response = sendRequest(comments, "GET", null);
+        LOGGER.info(response);
+        JiraCommentPagedResult pagedList = null;
+		if (!StringUtils.isEmpty(response)) {
+		    try {
+		        pagedList = new Gson().fromJson(response, new TypeToken<JiraCommentPagedResult>(){}.getType());
+		    } catch (Exception e) {
+		        LOGGER.error("", e);
+		    }
+		}
+		return pagedList != null ? pagedList.getComments() : null;
+	}
+
     //TODO Accomodate RestUtil so that it can be used also for the Jira purpose? (basically allow setting the content-type, which is now fixed
     private String sendRequest(String serviceUrl, String requestMethod, String encodedParamStr) throws Exception {
         LOGGER.info("Service: {}", serviceUrl);
@@ -127,12 +148,14 @@ public class JiraClientImpl implements JiraClient {
             conn.setDoInput(true);
             conn.setDoOutput(true);
 
-            dos = new DataOutputStream(conn.getOutputStream());
-            if (encodedParamStr != null) {
-                dos.writeBytes(encodedParamStr);
+            if (!"GET".equalsIgnoreCase(requestMethod)) {
+	            dos = new DataOutputStream(conn.getOutputStream());
+	            if (encodedParamStr != null) {
+	                dos.writeBytes(encodedParamStr);
+	            }
+	            dos.flush();
+	            dos.close();
             }
-            dos.flush();
-            dos.close();
 
             /*
              * InputStream inputStream = conn.getErrorStream(); if (null != inputStream) { List<String> a =
@@ -193,4 +216,5 @@ public class JiraClientImpl implements JiraClient {
         }
         return result;
     }
+
 }

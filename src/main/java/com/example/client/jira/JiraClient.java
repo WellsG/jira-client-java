@@ -13,4 +13,6 @@ public interface JiraClient {
 
     public Set<Issue> getIssuesByIds(List<String> ids, List<JiraField> fields) throws Exception;
 
+    public List<Comment> getComments(String issueId) throws Exception;
+
 }
