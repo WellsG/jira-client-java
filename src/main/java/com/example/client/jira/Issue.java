@@ -27,6 +27,7 @@ public class Issue implements Serializable {
     private String lastViewed;
     private String resolutionDate;
     private String dueDate;
+    private Issue parent;
 
     public Integer getId() {
         return id;
@@ -194,6 +195,14 @@ public class Issue implements Serializable {
 
 	public void setComponents(List<Component> components) {
 		this.components = components;
+	}
+
+	public Issue getParent() {
+		return parent;
+	}
+
+	public void setParent(Issue parent) {
+		this.parent = parent;
 	}
 
 }
